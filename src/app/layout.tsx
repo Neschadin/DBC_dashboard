@@ -25,9 +25,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <HeroUIProvider>
           <AuthSessionProvider>
             <TRPCProvider>
-              <div className="flex h-screen flex-col">
+              <div className="grid min-h-screen grid-rows-[auto_1fr]">
                 <Navigation />
-                <div className="min-h-0 grow-1">{children}</div>
+                {children}
               </div>
             </TRPCProvider>
           </AuthSessionProvider>
