@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -17,10 +18,20 @@ import { emailSchema, passwordSchema } from "~/lib/zod";
 import { ErrorCodes, ErrorMessages } from "~/lib/errors";
 import { PassVisibilityToggler } from "../_components/PassVisibilityToggler";
 
+const showError = (description: string) => {
+  addToast({
+    title: "Login failed",
+    description,
+    timeout: 5000,
+    color: "danger",
+    shouldShowTimeoutProgress: true,
+  });
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -44,20 +55,20 @@ export default function LoginPage() {
         });
 
         if (res?.error) {
-          setError(ErrorMessages[res.code as keyof typeof ErrorMessages]);
+          showError(ErrorMessages[res.code as keyof typeof ErrorMessages]);
         } else if (res?.ok) {
           router.push(callbackUrl);
           router.refresh();
         }
       } catch (error) {
         console.error("Login error:", error);
-        setError(ErrorMessages[ErrorCodes.UNEXPECTED_ERROR]);
+        showError(ErrorMessages[ErrorCodes.UNEXPECTED_ERROR]);
       }
     });
   };
 
   return (
-    <main className="container mx-auto grid h-full place-items-center p-4">
+    <main className="container mx-auto grid  h-full place-items-center p-4">
       <Card className="w-full max-w-md bg-gradient-to-tl from-white to-violet-50">
         <CardHeader className="flex flex-col items-center pb-6">
           <h1 className="text-2xl font-bold text-gray-900">

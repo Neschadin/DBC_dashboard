@@ -23,8 +23,20 @@ export const authRouter = createTRPCRouter({
 
       const passwordHash = await hash(password, 12);
 
-      const randomId = Math.floor(Math.random() * 150) + 1;
-      const avatarUrl = `https://i.pravatar.cc/150?img=${randomId}`;
+      let randomId = Math.floor(Math.random() * 150) + 1;
+      let avatarUrl = `https://i.pravatar.cc/${randomId}`;
+
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (
+        !(await checkImageAvailability(randomId)) &&
+        attempts < maxAttempts
+      ) {
+        randomId = Math.floor(Math.random() * 150) + 1;
+        avatarUrl = `https://i.pravatar.cc/${randomId}`;
+        attempts++;
+      }
 
       try {
         const newUser = await ctx.db
@@ -55,23 +67,21 @@ export const authRouter = createTRPCRouter({
         });
       }
     }),
-
-  // getMe: publicProcedure.query(async ({ ctx }) => {
-  //   const session = ctx.session;
-  //   if (!session?.user?.id) {
-  //     return null;
-  //   }
-
-  //   const user = await ctx.db.query.users.findFirst({
-  //     where: (users, { eq }) => eq(users.id, session.user.id),
-  //     columns: {
-  //       id: true,
-  //       name: true,
-  //       email: true,
-  //       image: true,
-  //     },
-  //   });
-
-  //   return user;
-  // }),
 });
+
+async function checkImageAvailability(id: number) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    const response = await fetch(`https://i.pravatar.cc/${id}`, {
+      method: "HEAD",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}

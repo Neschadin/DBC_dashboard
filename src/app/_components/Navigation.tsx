@@ -17,8 +17,8 @@ function UserSkeleton() {
   return (
     <NavbarItem>
       <div className="flex gap-3">
-        <Skeleton className="h-10 w-24 rounded-md" />
-        <Skeleton className="h-10 w-24 rounded-md" />
+        <Skeleton className="h-8 w-16 rounded-md" />
+        <Skeleton className="h-8 w-16 rounded-md" />
       </div>
     </NavbarItem>
   );
@@ -28,8 +28,6 @@ function SignedInItems(user: UserProps) {
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
   };
-
-  console.log({ user });
 
   return (
     <>
@@ -48,8 +46,9 @@ function SignedInItems(user: UserProps) {
           className="rounded-md border-gray-500 text-gray-500"
           variant="bordered"
           onPress={handleSignOut}
+          size="sm"
         >
-          Выйти
+          Exit
         </Button>
       </NavbarItem>
     </>
@@ -65,8 +64,9 @@ function SignedOutItems() {
           className="rounded-md border-gray-500 bg-gray-200 text-gray-500"
           href="/login"
           variant="bordered"
+          size="sm"
         >
-          Войти
+          Login
         </Button>
       </NavbarItem>
       <NavbarItem>
@@ -75,8 +75,9 @@ function SignedOutItems() {
           className="rounded-md bg-blue-500"
           href="/register"
           color="primary"
+          size="sm"
         >
-          Регистрация
+          Registration
         </Button>
       </NavbarItem>
     </>
@@ -95,7 +96,7 @@ function Navigation() {
   return (
     <Navbar className="border-divider border-b bg-gray-300 shadow-md">
       <NavbarBrand>
-        <Link href="/" className="font-bold text-gray-500">
+        <Link href="/" className="font-bold text-gray-500 sm:text-lg">
           DBC App
         </Link>
       </NavbarBrand>

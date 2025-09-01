@@ -41,3 +41,17 @@ yarn-error.log*
 .idea
 
 /temp
+/scripts
+# Logs
+logs
+*.log
+.taskmaster
+dev-debug.log
+.cursor
+.vscode
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
