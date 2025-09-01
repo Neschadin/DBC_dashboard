@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -27,6 +28,15 @@ export default function RegisterPage() {
   const registerMutation = api.auth.register.useMutation({
     onSuccess: () => {
       router.push("/login?message=registration_success");
+    },
+    onError: (error) => {
+      addToast({
+        title: "Registration failed",
+        description: error.message,
+        timeout: 5000,
+        color: "danger",
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 
@@ -124,12 +134,6 @@ export default function RegisterPage() {
                 (!!val && password === val) || "Passwords do not match"
               }
             />
-
-            {registerMutation.error && (
-              <p className="rounded-medium bg-danger-50 text-danger-600 px-3 py-2 text-sm">
-                {registerMutation.error.message}
-              </p>
-            )}
 
             <Button
               type="submit"

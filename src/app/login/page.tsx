@@ -35,14 +35,12 @@ function LoginForm() {
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState("");
 
   const handlePassVisibilityToggle = () =>
     setIsPasswordVisible(!isPasswordVisible);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
 
     startTransition(async () => {
       try {
@@ -61,7 +59,7 @@ function LoginForm() {
           router.refresh();
         }
       } catch (error) {
-        console.error("Login error:", error);
+        console.error("Login error:", { error });
         showError(ErrorMessages[ErrorCodes.UNEXPECTED_ERROR]);
       }
     });
@@ -111,12 +109,6 @@ function LoginForm() {
                 return res.success || res.error.errors[0]?.message;
               }}
             />
-
-            {error && (
-              <p className="bg-danger-50 text-danger-500 rounded-md px-3 py-2 text-sm">
-                {error}
-              </p>
-            )}
 
             <Button
               type="submit"
