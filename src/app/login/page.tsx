@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import {
@@ -28,7 +28,7 @@ const showError = (description: string) => {
   });
 };
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
@@ -68,7 +68,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="container mx-auto grid  h-full place-items-center p-4">
+    <main className="container mx-auto grid h-full place-items-center p-4">
       <Card className="w-full max-w-md bg-gradient-to-tl from-white to-violet-50">
         <CardHeader className="flex flex-col items-center pb-6">
           <h1 className="text-2xl font-bold text-gray-900">
@@ -141,5 +141,14 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </main>
+  );
+}
+
+//  ⨯ useSearchParams() should be wrapped in a suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Card, CardBody, CardHeader, useDisclosure } from "@heroui/react";
 import { CustomersList } from "./_components/CustomersList";
 import { DashboardStats } from "./_components/DashboardStats";
@@ -7,7 +8,7 @@ import { FiltersPanel } from "./_components/FiltersPanel";
 import { MobileFiltersModal } from "./_components/MobileFiltersModal";
 import { DashboardHeader } from "./_components/DashboardHeader";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const {
     isOpen: isFiltersOpen,
     onOpen: onFiltersOpen,
@@ -49,5 +50,14 @@ export default function DashboardPage() {
 
       <MobileFiltersModal isOpen={isFiltersOpen} onClose={onFiltersClose} />
     </main>
+  );
+}
+
+//  ⨯ useSearchParams() should be wrapped in a suspense boundary
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }
