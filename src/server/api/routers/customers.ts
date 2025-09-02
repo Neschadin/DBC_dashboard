@@ -1,7 +1,18 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { customers, orders } from "~/server/db/schema";
-import { eq, like, and, asc, desc, count, sql, inArray, or } from "drizzle-orm";
+import {
+  eq,
+  like,
+  and,
+  asc,
+  desc,
+  count,
+  inArray,
+  or,
+  isNotNull,
+  gt,
+} from "drizzle-orm";
 
 export const customersRouter = createTRPCRouter({
   getCustomers: protectedProcedure
@@ -39,27 +50,14 @@ export const customersRouter = createTRPCRouter({
 
       // Cursor-based pagination
       if (cursor) {
-        conditions.push(sql`${customers.id} > ${cursor}`);
+        conditions.push(gt(customers.id, cursor));
       }
 
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
       const results = await ctx.db
-        .select({
-          id: customers.id,
-          firstName: customers.firstName,
-          lastName: customers.lastName,
-          email: customers.email,
-          gender: customers.gender,
-          country: customers.country,
-          city: customers.city,
-          state: customers.state,
-          postCode: customers.postCode,
-          street: customers.street,
-          streetNumber: customers.streetNumber,
-          createdAt: customers.createdAt,
-        })
+        .select()
         .from(customers)
         .where(whereClause)
         .orderBy(asc(customers.id))
@@ -130,7 +128,7 @@ export const customersRouter = createTRPCRouter({
       const conditions = [eq(orders.customerId, customerId)];
 
       if (cursor) {
-        conditions.push(sql`${orders.id} > ${cursor}`);
+        conditions.push(gt(orders.id, cursor));
       }
 
       const results = await ctx.db
@@ -156,17 +154,16 @@ export const customersRouter = createTRPCRouter({
     const gendersResult = await ctx.db
       .select({ gender: customers.gender })
       .from(customers)
-      .where(sql`${customers.gender} IS NOT NULL`)
+      .where(isNotNull(customers.gender))
       .groupBy(customers.gender)
       .orderBy(asc(customers.gender));
 
     const countriesResult = await ctx.db
       .select({ country: customers.country })
       .from(customers)
-      .where(sql`${customers.country} IS NOT NULL`)
+      .where(isNotNull(customers.country))
       .groupBy(customers.country)
-      .orderBy(asc(customers.country))
-      .limit(50); // Limit countries for performance
+      .orderBy(asc(customers.country));
 
     return {
       genders: gendersResult.map((row) => row.gender).filter(Boolean),
@@ -186,7 +183,7 @@ export const customersRouter = createTRPCRouter({
     const deliveredOrdersResult = await ctx.db
       .select({ count: count() })
       .from(orders)
-      .where(sql`${orders.shippedAt} IS NOT NULL`);
+      .where(isNotNull(orders.shippedAt));
 
     return {
       totalCustomers: totalCustomersResult[0]?.count ?? 0,
